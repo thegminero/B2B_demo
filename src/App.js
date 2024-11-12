@@ -129,11 +129,11 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
+    document.addEventListener('keydown', (e)=> handleEscKey(e));
     return () => {
-      document.removeEventListener('keydown', handleEscKey);
+      document.removeEventListener('keydown', (e)=> handleEscKey(e));
     };
-  }, [handleEscKey]);
+  }, []);
 
   return (
     <header className="header">
