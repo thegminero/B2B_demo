@@ -1,38 +1,363 @@
-.App {
-  text-align: center;
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+.header {
+  background-color: #212529;
+  color: white;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  position: relative;
+}
+
+.header-content {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Logo */
+.logo {
+  max-width: 150px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+/* Desktop Header Layout */
+@media (min-width: 768px) {
+  .header-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    margin-bottom: 0; /* Remove margin on desktop */
+  }
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Search Box Container */
+.search-box-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-box-container input[type="search"] {
+  padding: 0.5rem 2.5rem 0.5rem 1rem; /* Leave space for the icon on the right */
+  font-size: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  background: #f4f4f4;
+}
+
+/* Embedded Search Icon */
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #888;
+  pointer-events: none;
+}
+
+/* Dropdown for Desktop */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  background: #212529;
+  border: 1px solid #ddd;
+  border-radius: 0 0 4px 4px;
+  max-height: 500px;
+  overflow-y: auto;
+  z-index: 101;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 1rem; /* Spacing between sections */
+  padding: 1rem;
+}
+
+.dropdown.show {
+  display: grid;
+}
+
+/* Dropdown Section */
+.dropdown-section {
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.dropdown-section h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  text-align: left;
+}
+
+.dropdown-item {
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item img {
+  width: 50px;
+  height: 50px;
+  margin-right: 0.5rem;
+}
+
+.dropdown-item h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: black;
+}
+
+.dropdown-item p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #666;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: white;
+  background-color: #007bff; /* Customize color as needed */
+  border-radius: 15px;
+}
+
+/* Position "Ver todos" link */
+.view-all {
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.view-all a {
+  color: #007bff;
+  font-size: 0.9rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.view-all a:hover {
+  text-decoration: underline;
+}
+
+/* Desktop layout for "Ver todos" link */
+@media (min-width: 768px) {
+  .dropdown-section {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+  
+  .view-all {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* Mobile Dropdown */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+  }
+
+  .search-box-container {
+    width: 80%;
+  }
+
+  .header h1 {
+    text-align: center;
+  }
+
+  .dropdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 90vh;
+    overflow-y: auto;
+    border-radius: 0;
+    padding: 1rem;
+    display: block;
+    z-index: 101;
+  }
+
+  .dropdown-section {
+    padding: 1rem;
+    border-radius: 4px;
+  }
+
+  .dropdown.show {
+    display: block;
+  }
+}
+
+/* Main Content */
+.main-content {
+  padding: 1rem;
+}
+
+/* Carousel Section */
+.carousel-section {
+  margin: 2rem 0;
+  background-color: #212529;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+.carousel-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Carousel Container */
+.carousel-container {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Carousel Scroll Container */
+.carousel {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+  height: 200px; /* Fixed height for the carousel */
+}
+
+/* Algolia Hits Styling */
+.ais-Hits-list {
+  display: flex; /* Horizontal scrolling layout */
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.ais-Hits-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Carousel Item Styling */
+.carousel-item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  height: 150px; /* Fixed height for each item */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Fixed Width for Carousel Item at Different Breakpoints */
+@media (min-width: 1024px) {
+  /* Display 3 items on desktop */
+  .ais-Hits-item {
+    min-width: calc(33.33% - 1rem);
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Display 2 items on tablets */
+  .ais-Hits-item {
+    min-width: calc(50% - 1rem);
   }
+}
+
+@media (max-width: 767px) {
+  /* Display 1 item at a time on mobile */
+  .ais-Hits-item {
+    height: 180px; /* Adjusted height for mobile */
+  }
+}
+
+/* Carousel Item Content Styling */
+.carousel-item img {
+  max-width: 100%;
+  max-height: 70px;
+  border-radius: 8px;
+}
+
+.carousel-item h3 {
+  font-size: 1rem;
+  margin: 0.5rem 0 0;
+}
+
+/* Carousel Buttons */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.carousel-button.left {
+  left: 0.5rem;
+}
+
+.carousel-button.right {
+  right: 0.5rem;
+}
+
+.ais-SearchBox-submit{
+  display: none;
 }
