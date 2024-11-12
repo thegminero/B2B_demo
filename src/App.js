@@ -133,7 +133,7 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
     return () => {
       document.removeEventListener('keydown', (e)=> handleEscKey(e));
     };
-  }, []);
+  }, [handleEscKey]);
 
   return (
     <header className="header">
