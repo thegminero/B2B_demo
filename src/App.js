@@ -3,6 +3,15 @@ import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { InstantSearch, SearchBox, Hits, Index, Configure, useHits } from 'react-instantsearch';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
+import {
+  FilmStrip,
+  Pizza,
+  ShoppingCart,
+  Television,
+  Gear,
+  WifiHigh,
+  
+} from '@phosphor-icons/react';
 
 const searchClient = algoliasearch('MWN8IH23ME', '4e648074863f9356162d9db95a19efe0');
 
@@ -10,10 +19,7 @@ const searchClient = algoliasearch('MWN8IH23ME', '4e648074863f9356162d9db95a19ef
 const PeliculasHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.NOMBRE_COMERCIAL}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.NOMBRE_COMERCIAL}`)}>
       <h3>{hit.NOMBRE_COMERCIAL}</h3>
     </div>
   );
@@ -22,10 +28,7 @@ const PeliculasHit = ({ hit }) => {
 const FoodHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.name}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.name}`)}>
       <h3>{hit.name}</h3>
     </div>
   );
@@ -34,10 +37,7 @@ const FoodHit = ({ hit }) => {
 const ShopHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.name}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.name}`)}>
       <img src={hit.imageGroups?.[0]?.images?.[0]?.disBaseLink} alt={hit.name} />
       <h3>{hit.name}</h3>
     </div>
@@ -47,58 +47,45 @@ const ShopHit = ({ hit }) => {
 const CanalesHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.nombre}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.nombre}`)}>
       <h3>{hit.nombre}</h3>
-      
     </div>
   );
 };
-
 
 const ServicionsHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.nombre}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.nombre}`)}>
       <h3>{hit.nombre}</h3>
     </div>
   );
 };
 
-
 const TotalPlayHit = ({ hit }) => {
   const navigate = useNavigate();
   return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.nombrePaquete}`)}
-    >
+    <div className="dropdown-item" onMouseDown={() => navigate(`/search?query=${hit.nombrePaquete}`)}>
       <h3>{hit.nombrePaquete}</h3>
-      {hit.nombrePaquete && <span className="pill">{hit.megas} MB</span>}
+      {hit.megas && <span className="pill">{hit.megas} MB</span>}
     </div>
   );
 };
 
-// Custom hits component that checks for hits and renders them
-function CustomHits({ HitComponent }) {
-  const { items, sendEvent } = useHits();
+// CustomHits component with conditional rendering based on hits count
+function CustomHits({ HitComponent, setVisible }) {
+  const { items } = useHits();
 
-  // Render nothing if there are no items
+  useEffect(() => {
+    setVisible(items.length > 0); // Update visibility based on hits count
+  }, [items, setVisible]);
+
   if (items.length === 0) return null;
 
   return (
     <div className="hits-container">
       {items.map((hit) => (
-        <div
-          key={hit.objectID}
-          onClick={() => sendEvent('click', hit, 'Hit Clicked')}
-          onAuxClick={() => sendEvent('click', hit, 'Hit Clicked')}
-        >
+        <div key={hit.objectID}>
           <HitComponent hit={hit} />
         </div>
       ))}
@@ -106,39 +93,20 @@ function CustomHits({ HitComponent }) {
   );
 }
 
-// Section component with MutationObserver to hide if no hits are present
-const HitsSection = ({ indexName, title, HitComponent }) => {
-  const sectionRef = useRef(null);
+// Section component with an icon
+const HitsSection = ({ indexName, title, Icon, HitComponent }) => {
   const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      if (sectionRef.current) {
-        // Check if there are any hits in the section
-        const hasHits = sectionRef.current.querySelectorAll('.hits-container > *').length > 0;
-        setVisible(hasHits);
-      }
-    });
-
-    // Observe the section for changes
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current, {
-        childList: true,
-        subtree: true,
-      });
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <Index indexName={indexName}>
       <Configure hitsPerPage={3} />
       {visible && (
-        <div className="dropdown-section" ref={sectionRef}>
-          <h2>{title}</h2>
-          <CustomHits HitComponent={HitComponent} />
-          {/* "Ver todos" link */}
+        <div className="dropdown-section">
+          <h2>
+            <Icon size={20} style={{ marginRight: '0.5rem' }} />
+            {title}
+          </h2>
+          <CustomHits HitComponent={HitComponent} setVisible={setVisible} />
           <div className="view-all">
             <a href={`/search?index=${indexName}`} onClick={(e) => e.stopPropagation()}>
               Ver todos
@@ -149,6 +117,77 @@ const HitsSection = ({ indexName, title, HitComponent }) => {
     </Index>
   );
 };
+
+const Header = ({ dropdownOpen, setDropdownOpen }) => {
+  const [query, setQuery] = useState('');
+
+  const handleEscKey = (event) => {
+    if (event.key === 'Escape') {
+      setDropdownOpen(false);
+      setQuery(''); // Clear the query
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, []);
+
+  const handleQueryChange = (event) => {
+    const newQuery = event.currentTarget.value;
+    setQuery(newQuery);
+
+    // Reopen the dropdown if there's a new query being typed
+    if (newQuery && !dropdownOpen) {
+      setDropdownOpen(true);
+    }
+  };
+
+  return (
+    <header className="header">
+      <div className="header-content">
+        <img
+          src="https://www.totalplay.com.mx/assets/img/nuevos/totalplay-logoWhite.svg"
+          alt="Totalplay Logo"
+          className="logo"
+        />
+        <InstantSearch searchClient={searchClient}>
+          <div
+            className="search-box-container"
+            onFocus={() => setDropdownOpen(true)}
+            onBlur={() => setDropdownOpen(false)}
+          >
+            <SearchBox
+              value={query}
+              onChange={handleQueryChange}
+              translations={{ placeholder: 'Search for products...' }}
+            />
+            <span className="search-icon">&#128269;</span>
+          </div>
+          {dropdownOpen && (
+            <div className="dropdown show">
+              <HitsSection indexName="demo_peliculas" title="Peliculas" Icon={FilmStrip} HitComponent={PeliculasHit} />
+              <HitsSection indexName="demo_food" title="Comida" Icon={Pizza} HitComponent={FoodHit} />
+              <HitsSection indexName="demo_shop" title="Tienda" Icon={ShoppingCart} HitComponent={ShopHit} />
+              <HitsSection indexName="demo_canales" title="Canales" Icon={Television} HitComponent={CanalesHit} />
+              <HitsSection indexName="demo_servicions" title="Servicios" Icon={Gear} HitComponent={ServicionsHit} />
+              <HitsSection indexName="demo_totalplay" title="Total Play" Icon={WifiHigh} HitComponent={TotalPlayHit} />
+            </div>
+          )}
+        </InstantSearch>
+      </div>
+    </header>
+  );
+};
+
+
+const Footer = () => (
+  <footer className="footer">
+    <p>© 2023 My Shop. All rights reserved.</p>
+  </footer>
+);
 
 // Carousel Hit components for each index
 const PeliculasCarouselHit = ({ hit }) => (
@@ -170,13 +209,12 @@ const ShopCarouselHit = ({ hit }) => (
   </div>
 );
 
-const CarouselSection = ({ indexName, title, HitComponent, ruleContexts, analyticsTags }) => {
+const CarouselSection = ({ indexName, title, Icon, HitComponent, ruleContexts, analyticsTags }) => {
   const carouselRef = useRef(null);
 
-  // Scroll the carousel left or right
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth; // Scroll by carousel width
+      const scrollAmount = carouselRef.current.clientWidth;
       carouselRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
@@ -186,15 +224,12 @@ const CarouselSection = ({ indexName, title, HitComponent, ruleContexts, analyti
 
   return (
     <Index indexName={indexName}>
-      {/* Configure component with unique rulesContext and analyticsTags */}
-      <Configure
-        hitsPerPage={10}
-        query=""
-        ruleContexts={ruleContexts}
-        analyticsTags={analyticsTags}
-      />
+      <Configure hitsPerPage={10} query="" ruleContexts={ruleContexts} analyticsTags={analyticsTags} />
       <section className="carousel-section">
-        <h2>{title}</h2>
+        <h2>
+          <Icon size={20} style={{ marginRight: '0.5rem' }} />
+          {title}
+        </h2>
         <div className="carousel-container">
           <button className="carousel-button left" onClick={() => scrollCarousel('left')}>
             &#9664;
@@ -211,98 +246,15 @@ const CarouselSection = ({ indexName, title, HitComponent, ruleContexts, analyti
   );
 };
 
-
-const Header = ({ dropdownOpen, setDropdownOpen }) => {
-  return (
-    <header className="header">
-      <div className="header-content">
-        <img
-          src="https://www.totalplay.com.mx/assets/img/nuevos/totalplay-logoWhite.svg"
-          alt="Totalplay Logo"
-          className="logo"
-        />
-        
-        <InstantSearch searchClient={searchClient} >
-          <div
-            className="search-box-container"
-            onFocus={() => setDropdownOpen(true)}
-            onBlur={() => setDropdownOpen(false)}
-          >
-            <SearchBox
-              translations={{ placeholder: 'Search for products...' }}
-              submitIconComponent={() => null}  // Removes default submit icon
-              resetIconComponent={() => null}   // Removes default clear icon
-            />
-            <span className="search-icon">&#128269;</span>
-          </div>
-          {dropdownOpen && (
-            <div className="dropdown show">
-              {/* Peliculas Section */}
-              <HitsSection indexName="demo_peliculas" title="Peliculas" HitComponent={PeliculasHit} />
-              
-              {/* Food Section */}
-              <HitsSection indexName="demo_food" title="Comida" HitComponent={FoodHit} />
-
-              {/* Shop Section */}
-              <HitsSection indexName="demo_shop" title="Tienda" HitComponent={ShopHit} />
-
-              {/* Canales Section */}
-              <HitsSection indexName="demo_canales" title="Canales" HitComponent={CanalesHit} />
-              
-              {/* Servicios Section */}
-              <HitsSection indexName="demo_servicions" title="Servicios" HitComponent={ServicionsHit} />
-
-              {/* TotalPlay Section */}
-              <HitsSection indexName="demo_totalplay" title="Total Play" HitComponent={TotalPlayHit} />
-            </div>
-          )}
-        </InstantSearch>
-      </div>
-    </header>
-  );
-};
-
-const Footer = () => (
-  <footer className="footer">
-    <p>© 2023 My Shop. All rights reserved.</p>
-  </footer>
-);
-
-
 const Home = () => (
   <main className="main-content">
-
-    <InstantSearch searchClient={searchClient} >
-      
-      {/* Peliculas Carousel */}
-      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "peliculas"]} 
-      indexName="demo_peliculas" title="Peliculas" HitComponent={PeliculasCarouselHit} />
-      
-      {/* Food Carousel */}
-      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "comida"]} 
-        indexName="demo_food" title="Tienes Hambre?" HitComponent={FoodCarouselHit} />
-      
-      {/* Shop Carousel */}
-      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "compra"]} 
-        indexName="demo_shop" title="Compra en Linea" HitComponent={ShopCarouselHit} />
-      
-      {/* Add other carousel sections here as needed */}
+    <InstantSearch searchClient={searchClient}>
+      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "peliculas"]} indexName="demo_peliculas" title="Peliculas" Icon={FilmStrip} HitComponent={PeliculasCarouselHit} />
+      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "comida"]} indexName="demo_food" title="Tienes Hambre?" Icon={Pizza} HitComponent={FoodCarouselHit} />
+      <CarouselSection ruleContexts={["homepromo"]} analyticsTags={["carousel", "compra"]} indexName="demo_shop" title="Compra en Linea" Icon={ShoppingCart} HitComponent={ShopCarouselHit} />
     </InstantSearch>
   </main>
 );
-
-
-const SearchPage = () => {
-  const queryParams = new URLSearchParams(window.location.search);
-  const query = queryParams.get('query');
-
-  return (
-    <main className="main-content">
-      <h2>Search Results for "{query}"</h2>
-      {/* Render search results here based on query */}
-    </main>
-  );
-};
 
 function App() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -313,7 +265,6 @@ function App() {
         <Header dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchPage />} />
         </Routes>
         <Footer />
       </div>

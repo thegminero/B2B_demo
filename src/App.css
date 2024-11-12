@@ -18,6 +18,20 @@
   min-height: 100vh;
 }
 
+/* Section Header Styling with Icon */
+.dropdown-section h2, .carousel-section h2 {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Adjust padding for Icon */
+.dropdown-section h2 svg, .carousel-section h2 svg {
+  margin-right: 8px;
+  color: #007bff; /* Customize icon color */
+}
+
 .header {
   background-color: #212529;
   color: white;
@@ -360,4 +374,8 @@
 
 .ais-SearchBox-submit{
   display: none;
+}
+
+.ais-SearchBox-reset{
+ display: none;
 }
