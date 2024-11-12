@@ -57,17 +57,6 @@ const CanalesHit = ({ hit }) => {
   );
 };
 
-const PromocionesHit = ({ hit }) => {
-  const navigate = useNavigate();
-  return (
-    <div
-      className="dropdown-item"
-      onMouseDown={() => navigate(`/search?query=${hit.nombre}`)}
-    >
-      <h3>{hit.nombre}</h3>
-    </div>
-  );
-};
 
 const ServicionsHit = ({ hit }) => {
   const navigate = useNavigate();
