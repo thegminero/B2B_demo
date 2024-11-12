@@ -2,7 +2,7 @@ import './App.css';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { InstantSearch, SearchBox, Hits, Index, Configure, useHits } from 'react-instantsearch';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const searchClient = algoliasearch('MWN8IH23ME', '4e648074863f9356162d9db95a19efe0');
 
@@ -106,22 +106,49 @@ function CustomHits({ HitComponent }) {
   );
 }
 
-// Section component to render hits for an index only if there are results
-const HitsSection = ({ indexName, title, HitComponent }) => (
-  <Index indexName={indexName}>
-    <Configure hitsPerPage={3} />
-    <div className="dropdown-section">
-      <h2>{title}</h2>
-      <CustomHits HitComponent={HitComponent} />
-      {/* "Ver todos" link */}
-      <div className="view-all">
-        <a href={`/search?index=${indexName}`} onClick={(e) => e.stopPropagation()}>
-          Ver todos
-        </a>
-      </div>
-    </div>
-  </Index>
-);
+// Section component with MutationObserver to hide if no hits are present
+const HitsSection = ({ indexName, title, HitComponent }) => {
+  const sectionRef = useRef(null);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      if (sectionRef.current) {
+        // Check if there are any hits in the section
+        const hasHits = sectionRef.current.querySelectorAll('.hits-container > *').length > 0;
+        setVisible(hasHits);
+      }
+    });
+
+    // Observe the section for changes
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current, {
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <Index indexName={indexName}>
+      <Configure hitsPerPage={3} />
+      {visible && (
+        <div className="dropdown-section" ref={sectionRef}>
+          <h2>{title}</h2>
+          <CustomHits HitComponent={HitComponent} />
+          {/* "Ver todos" link */}
+          <div className="view-all">
+            <a href={`/search?index=${indexName}`} onClick={(e) => e.stopPropagation()}>
+              Ver todos
+            </a>
+          </div>
+        </div>
+      )}
+    </Index>
+  );
+};
 
 // Carousel Hit components for each index
 const PeliculasCarouselHit = ({ hit }) => (
