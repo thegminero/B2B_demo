@@ -124,7 +124,7 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
   const handleEscKey = (event) => {
     if (event.key === 'Escape') {
       setDropdownOpen(false);
-      setQuery(''); // Clear the query
+      setQuery(''); 
     }
   };
 
@@ -134,16 +134,6 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
       document.removeEventListener('keydown', handleEscKey);
     };
   }, [handleEscKey]);
-
-  const handleQueryChange = (event) => {
-    const newQuery = event.currentTarget.value;
-    setQuery(newQuery);
-
-    // Reopen the dropdown if there's a new query being typed
-    if (newQuery && !dropdownOpen) {
-      setDropdownOpen(true);
-    }
-  };
 
   return (
     <header className="header">
@@ -161,7 +151,6 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
           >
             <SearchBox
               value={query}
-              onChange={handleQueryChange}
               translations={{ placeholder: 'Search for products...' }}
             />
             <span className="search-icon">&#128269;</span>
