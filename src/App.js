@@ -244,8 +244,7 @@ const Footer = () => (
 
 const Home = () => (
   <main className="main-content">
-    <h2></h2>
-    <p></p>
+
     <InstantSearch searchClient={searchClient} >
       
       {/* Peliculas Carousel */}
