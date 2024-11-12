@@ -133,7 +133,7 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
     return () => {
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, []);
+  }, [handleEscKey]);
 
   const handleQueryChange = (event) => {
     const newQuery = event.currentTarget.value;
