@@ -138,6 +138,30 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
       search(query); // Execute search after 100ms delay
     }, 500);
   };
+  const handleFocus = () => {
+    console.log('hocus focus')
+    setQuery(' ')
+  }
+  const handleBlur = () => {
+    console.log('blurus')
+    setDropdownOpen(false);
+      setQuery('');
+  }
+  useEffect(() => {
+    const inputElement = document.querySelector('.ais-SearchBox-input');
+    if (inputElement) {
+      inputElement.addEventListener('focus', handleFocus);
+      inputElement.addEventListener('blur', handleBlur);
+    }
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener('focus', handleFocus);
+        inputElement.addEventListener('blur', handleBlur);
+      }
+    };
+  });
 
   return (
     <header className="header">
