@@ -72,68 +72,72 @@ const TotalPlayHit = ({ hit }) => {
   );
 };
 
-// CustomHits component with conditional rendering based on hits count
-function CustomHits({ HitComponent, setVisible }) {
+
+
+const HitsSection = ({ indexName, title, Icon, HitComponent, query }) => {
   const { items } = useHits();
 
-  useEffect(() => {
-    setVisible(items.length > 0); // Update visibility based on hits count
-  }, [items, setVisible]);
-
-  if (items.length === 0) return null;
+  if (items.length === 0) return null; // Conditionally render based on items count
 
   return (
-    <div className="hits-container">
-      {items.map((hit) => (
-        <div key={hit.objectID}>
-          <HitComponent hit={hit} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Section component with an icon
-const HitsSection = ({ indexName, title, Icon, HitComponent }) => {
-  const [visible, setVisible] = useState(true);
-
-  return (
-    <Index indexName={indexName}>
-      <Configure hitsPerPage={3} />
-      {visible && (
-        <div className="dropdown-section">
-          <h2>
-            <Icon size={20} style={{ marginRight: '0.5rem' }} />
-            {title}
-          </h2>
-          <CustomHits HitComponent={HitComponent} setVisible={setVisible} />
-          <div className="view-all">
-            <a href={`/search?index=${indexName}`} onClick={(e) => e.stopPropagation()}>
-              Ver todos
-            </a>
+    <div className="dropdown-section">
+      <h2>
+        <Icon size={20} style={{ marginRight: '0.5rem' }} />
+        {title}
+      </h2>
+      <Configure query={query} hitsPerPage={3} />
+      <div className="hits-container">
+        {items.map((hit) => (
+          <div key={hit.objectID}>
+            <HitComponent hit={hit} />
           </div>
-        </div>
-      )}
-    </Index>
+        ))}
+      </div>
+      <div className="view-all">
+        <a href={`/search?index=${indexName}`} onClick={(e) => e.stopPropagation()}>
+          Ver todos
+        </a>
+      </div>
+    </div>
   );
 };
 
+// Header component with search box and dropdown handling
 const Header = ({ dropdownOpen, setDropdownOpen }) => {
   const [query, setQuery] = useState('');
+  const debounceTimeout = useRef(null);
+
+  useEffect(() => {
+    setDropdownOpen(query !== ''); // Toggle dropdown visibility
+  }, [query, setDropdownOpen]);
 
   const handleEscKey = (event) => {
     if (event.key === 'Escape') {
       setDropdownOpen(false);
-      setQuery(''); 
+      setQuery('');
     }
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', (e)=> handleEscKey(e));
+    document.addEventListener('keydown', handleEscKey);
     return () => {
-      document.removeEventListener('keydown', (e)=> handleEscKey(e));
+      document.removeEventListener('keydown', handleEscKey);
     };
-  }, [handleEscKey]);
+  }, []);
+
+  const debouncedQueryHook = (query, search) => {
+    setQuery(query); // Update query state for dropdown control
+
+    // Clear the previous timeout if it exists
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set a new timeout to delay the search function call
+    debounceTimeout.current = setTimeout(() => {
+      search(query); // Execute search after 100ms delay
+    }, 500);
+  };
 
   return (
     <header className="header">
@@ -144,25 +148,70 @@ const Header = ({ dropdownOpen, setDropdownOpen }) => {
           className="logo"
         />
         <InstantSearch searchClient={searchClient}>
-          <div
-            className="search-box-container"
-            onFocus={() => setDropdownOpen(true)}
-            onBlur={() => setDropdownOpen(false)}
-          >
+          <div className="search-box-container">
             <SearchBox
-              value={query}
+              queryHook={debouncedQueryHook}
               translations={{ placeholder: 'Search for products...' }}
             />
             <span className="search-icon">&#128269;</span>
           </div>
           {dropdownOpen && (
             <div className="dropdown show">
-              <HitsSection indexName="demo_peliculas" title="Peliculas" Icon={FilmStrip} HitComponent={PeliculasHit} />
-              <HitsSection indexName="demo_food" title="Comida" Icon={Pizza} HitComponent={FoodHit} />
-              <HitsSection indexName="demo_shop" title="Tienda" Icon={ShoppingCart} HitComponent={ShopHit} />
-              <HitsSection indexName="demo_canales" title="Canales" Icon={Television} HitComponent={CanalesHit} />
-              <HitsSection indexName="demo_servicions" title="Servicios" Icon={Gear} HitComponent={ServicionsHit} />
-              <HitsSection indexName="demo_totalplay" title="Total Play" Icon={WifiHigh} HitComponent={TotalPlayHit} />
+              <Index indexName="demo_peliculas">
+                <HitsSection
+                  title="Peliculas"
+                  Icon={FilmStrip}
+                  HitComponent={PeliculasHit}
+                  indexName="demo_peliculas"
+                  query={query} 
+                />
+              </Index>
+              <Index indexName="demo_food">
+                <HitsSection
+                  title="Comida"
+                  Icon={Pizza}
+                  HitComponent={FoodHit}
+                  indexName="demo_food"
+                  query={query} 
+                />
+              </Index>
+              <Index indexName="demo_shop">
+              <HitsSection
+                  title="Compra"
+                  Icon={ShoppingCart}
+                  HitComponent={ShopHit}
+                  indexName="demo_shop"
+                  query={query} 
+                />
+              </Index>
+              <Index indexName="demo_canales">
+              <HitsSection
+                  title="Canales"
+                  Icon={Television}
+                  HitComponent={CanalesHit}
+                  indexName="demo_canales"
+                  query={query} 
+                />
+              </Index>
+              <Index indexName="demo_servicions">
+              <HitsSection
+                  title="Servicios"
+                  Icon={Gear}
+                  HitComponent={ServicionsHit}
+                  indexName="demo_servicions"
+                  query={query} 
+                />
+              </Index>
+              <Index indexName="demo_totalplay">
+              <HitsSection
+                  title="Total Play"
+                  Icon={WifiHigh}
+                  HitComponent={TotalPlayHit}
+                  indexName="demo_totalplay"
+                  query={query} 
+                />
+              </Index>
+             
             </div>
           )}
         </InstantSearch>
